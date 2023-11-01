@@ -13,18 +13,18 @@ module tt_um_kskyou (
 
     assign uio_oe = 8'b00000000;
     assign uio_out = 8'b00000000;
-    assign uo_out = out;
+    assign uo_out = {1'b0, out};
     
-    reg [14:0] D;
+    reg [13:0] D;
     reg [8:0] R;
-    wire [14:0] R2 = R * R;
+    wire [15:0] R2 = R * R;
     reg [3:0] state;
     
     reg button1;
     reg button0;
     
-    reg [31:0] P;
-    reg [31:0] Q;
+    reg [15:0] P;
+    reg [15:0] Q;
     
     reg [3:0] watch;
     wire [6:0] out;
@@ -54,11 +54,11 @@ module tt_um_kskyou (
                     if (R2 > D) begin
                         state <= 0;
                         watch <= 0;
+                        P <= R - 1;
+                        Q <= 1;
                         R <= R - 1;
                     end else begin
                         R <= R + 1;
-                        P <= R;
-                        Q <= 1;
                     end
                 end
             endcase
@@ -70,8 +70,8 @@ module tt_um_kskyou (
 endmodule
 
 module seven_segment (
-    input wire [31:0] P,
-    input wire [31:0] Q,
+    input wire [15:0] P,
+    input wire [15:0] Q,
     input wire [3:0] watch,
     output reg [6:0] out
 );
@@ -79,17 +79,17 @@ module seven_segment (
     
 always @(watch, P, Q) begin
     case (watch)
-        1: num <= P[31:24];
-        2: num <= P[23:16];
-        3: num <= P[15:8];
-        4: num <= P[7:0];
-        6: num <= Q[31:24];
-        7: num <= Q[23:16];
-        8: num <= Q[15:8];
-        9: num <= Q[7:0];
+        1: num <= P[15:12];
+        2: num <= P[11:8];
+        3: num <= P[7:4];
+        4: num <= P[3:0];
+        6: num <= Q[15:12];
+        7: num <= Q[11:8];
+        8: num <= Q[7:4];
+        9: num <= Q[3:0];
     endcase
 end
-
+    
 always @(num, watch) begin
     if (watch == 0) begin
         out <= 7'b1110011;
@@ -116,5 +116,3 @@ always @(num, watch) begin
          endcase
      end
 end
-
-endmodule
