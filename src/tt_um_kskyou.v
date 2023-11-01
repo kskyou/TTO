@@ -116,3 +116,5 @@ always @(num, watch) begin
          endcase
      end
 end
+
+endmodule
